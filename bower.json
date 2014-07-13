@@ -1,0 +1,13 @@
+{
+    "name": "LB",
+    "dependencies": {
+        "jquery": "1.*",
+        "handlebars": "*",
+        "require-handlebars-plugin": "*",
+        "requirejs": "*",
+        "requirejs-text": "*",
+        "jquery-ui": "*",
+        "modernizr": "*",
+        "bootstrap": "*"
+    }
+}
