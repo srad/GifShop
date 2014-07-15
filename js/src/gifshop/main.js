@@ -22,12 +22,13 @@ require([], function () {
             var red = pixels[i],
                 green = pixels[i + 1];
 
-            setPixel(colorMapImage, red, green, red, green, 0, 255);
+            setPixel(colorMapImage, red, 255 - green, red, green, 0, 255);
         }
 
+        // Rahmen
         for (var x = 0; x < 256; x++) {
             for (var y = 0; y < 256; y++) {
-                if (y === 0 || y === 255 || x === 0 || x === 255) {
+                if (y === 255 || x === 0 ) {
                     setPixel(colorMapImage, x, y, 0, 0, 0, 255);
                 }
             }
