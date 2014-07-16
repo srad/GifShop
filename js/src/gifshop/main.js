@@ -1,5 +1,18 @@
-require([], function () {
+require(['domReady'], function (domReady) {
     'use strict';
+
+    var btn = document.getElementById('btn'),
+        paletteSize = document.getElementById('paletteSize'),
+        colors = parseInt(window.location.href.split('#')[1], 10) || 256;
+
+    btn.onclick = function (event) {
+        window.location = window.location.href.split('#')[0] + '#' + paletteSize.value;
+        window.location.reload();
+    };
+
+    domReady(function () {
+        paletteSize.value = colors;
+    });
 
     var canvas = document.getElementById('c'),
         context = canvas.getContext('2d'),
@@ -7,8 +20,10 @@ require([], function () {
         reducedContext = document.getElementById('reduced').getContext('2d'),
         palette = document.getElementById('palette'),
         paletteContext = palette.getContext('2d'),
+        paletteSpaceContext = document.getElementById('paletteSpace'),
+        paletteSpaceContext = paletteSpaceContext.getContext('2d'),
         imageObj = new Image(),
-        PALETTE_SIZE = 256;
+        PALETTE_SIZE = colors;
 
     function Vec2d(x, y) {
         this.x = x;
@@ -44,6 +59,34 @@ require([], function () {
         return distances[0].vec2d;
     }
 
+    function drawFrame(image) {
+        // Frame
+        for (var x = 0; x < 256; x++) {
+            for (var y = 0; y < 256; y++) {
+                if (y === 255 || x === 0) {
+                    setPixel(image, x, y, 0, 0, 0, 255);
+                }
+            }
+        }
+    }
+
+    function drawColorDistribution(context, pixels) {
+        var colorMapImage = context.createImageData(256, 256);
+
+        for (var i = 0; i < pixels.length; i += 4) {
+            var red = pixels[i],
+                green = pixels[i + 1],
+                vec2d = new Vec2d(red, green);
+
+            if (colorCount[vec2d.hash()] === undefined) {
+                colorCount[vec2d.hash()] = 1;
+            } else {
+                colorCount[vec2d.hash()] += 1;
+            }
+            setPixel(colorMapImage, red, 255 - green, red, green, 0, 255);
+        }
+    }
+
     function drawPallete(context, colors) {
         var size = 24,
             xOffset = 0,
@@ -69,18 +112,18 @@ require([], function () {
         }
     }
 
+    function setPixel(imageData, x, y, r, g, b, a) {
+        var index = (x + y * imageData.width) * 4;
+        imageData.data[index + 0] = r;
+        imageData.data[index + 1] = g;
+        imageData.data[index + 2] = b;
+        imageData.data[index + 3] = a;
+    }
+
     var read = function () {
         var pixels = context.getImageData(0, 0, imageObj.width, imageObj.height).data,
             colorMapImage = colorSpaceContext.createImageData(256, 256),
             colorCount = {};
-
-        function setPixel(imageData, x, y, r, g, b, a) {
-            var index = (x + y * imageData.width) * 4;
-            imageData.data[index + 0] = r;
-            imageData.data[index + 1] = g;
-            imageData.data[index + 2] = b;
-            imageData.data[index + 3] = a;
-        }
 
         for (var i = 0; i < pixels.length; i += 4) {
             var red = pixels[i],
@@ -109,14 +152,7 @@ require([], function () {
             return a.count - b.count;
         });
 
-        // Frame
-        for (var x = 0; x < 256; x++) {
-            for (var y = 0; y < 256; y++) {
-                if (y === 255 || x === 0) {
-                    setPixel(colorMapImage, x, y, 0, 0, 0, 255);
-                }
-            }
-        }
+        drawFrame(colorMapImage);
 
         colorSpaceContext.scale(3, 3);
         colorSpaceContext.putImageData(colorMapImage, 0, 0);
@@ -137,10 +173,17 @@ require([], function () {
             reducedImage.data[i + 2] = 0;
             reducedImage.data[i + 3] = 255;
         }
+        reducedContext.putImageData(reducedImage, 0, 0);
 
         drawPallete(paletteContext, colors256);
+        var paletteImage = paletteSpaceContext.createImageData(256, 256);
+        for (var i = 0; i < colors256.length; i++) {
+            var color = colors256[i];
+            setPixel(paletteImage, color.vec2d.x, 255 - color.vec2d.y, color.vec2d.x, color.vec2d.y, 0, 255);
+        }
+        drawFrame(paletteImage);
+        paletteSpaceContext.putImageData(paletteImage, 0, 0);
 
-        reducedContext.putImageData(reducedImage, 0, 0);
     };
 
     imageObj.onload = function () {
