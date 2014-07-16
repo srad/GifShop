@@ -5,7 +5,10 @@ require([], function () {
         context = canvas.getContext('2d'),
         colorSpaceContext = document.getElementById('colorspace').getContext('2d'),
         reducedContext = document.getElementById('reduced').getContext('2d'),
-        imageObj = new Image();
+        palette = document.getElementById('palette'),
+        paletteContext = palette.getContext('2d'),
+        imageObj = new Image(),
+        PALETTE_SIZE = 256;
 
     function Vec2d(x, y) {
         this.x = x;
@@ -39,6 +42,31 @@ require([], function () {
             return a.distance - b.distance;
         });
         return distances[0].vec2d;
+    }
+
+    function drawPallete(context, colors) {
+        var size = 24,
+            xOffset = 0,
+            yOffset = 0,
+            colorsPerRow = 20,
+            gapBetweenColors = 2;
+
+        palette.width = size * colorsPerRow;
+        palette.height = Math.max(size, (size * Math.ceil(colors.length / colorsPerRow)) - gapBetweenColors);
+
+        for (var i = 0; i < colors.length; i++) {
+            var color = colors[i];
+
+            context.fillStyle = "rgb(" + color.vec2d.x + "," + color.vec2d.y + ",0)";
+            context.fillRect(xOffset, yOffset, size - gapBetweenColors, size - gapBetweenColors);
+
+            xOffset += size;
+
+            if ((i + 1) % colorsPerRow === 0) {
+                yOffset += size;
+                xOffset = 0;
+            }
+        }
     }
 
     var read = function () {
@@ -94,7 +122,7 @@ require([], function () {
         colorSpaceContext.putImageData(colorMapImage, 0, 0);
 
         // Reduced color
-        var colors256 = colorArray.reverse().splice(0, 256),
+        var colors256 = colorArray.reverse().splice(0, PALETTE_SIZE),
             reducedImage = reducedContext.createImageData(300, 225);
 
         for (var i = 0; i < pixels.length; i += 4) {
@@ -109,6 +137,8 @@ require([], function () {
             reducedImage.data[i + 2] = 0;
             reducedImage.data[i + 3] = 255;
         }
+
+        drawPallete(paletteContext, colors256);
 
         reducedContext.putImageData(reducedImage, 0, 0);
     };
