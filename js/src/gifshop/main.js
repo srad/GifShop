@@ -45,17 +45,29 @@ require(['domReady'], function (domReady) {
         return Math.sqrt(Math.pow(vec2d.x - this.x, 2) + Math.pow(vec2d.y - this.y, 2));
     };
 
+    var cache = {};
+
     function findClosestVector(colorPalette, vec2d) {
-        var distances = [];
+
+        if (cache[vec2d.hash()] !== undefined) {
+            return cache[vec2d.hash()];
+        }
+
+        var distances = [],
+            distance = 9999999999999999;
         for (var i = 0; i < colorPalette.length; i++) {
-            var color = colorPalette[i],
-                distance = vec2d.distanceTo(color.vec2d);
+            var color = colorPalette[i];
+
+            distance = vec2d.distanceTo(color.vec2d);
 
             distances.push({vec2d: color.vec2d, distance: distance});
         }
         distances.sort(function (a, b) {
             return a.distance - b.distance;
         });
+
+        cache[vec2d.hash()] = distances[0].vec2d;
+
         return distances[0].vec2d;
     }
 
