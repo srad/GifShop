@@ -20,32 +20,94 @@
     <script src="js/src/vendor/modernizr/modernizr.js"></script>
     <script data-main="js/src/gifshop/main" src="js/src/vendor/requirejs/require.js"></script>
 </head>
-<body style="padding: 20px;">
+<body style="padding: 0px; margin-top: -10px;">
 
 <div class="container">
-    <div class="row row1">
-        <div class="">
-            <canvas class="thumbnail" id="c" width="300" height="225"></canvas>
-            <canvas class="thumbnail" id="colorspace" width="256" height="256"></canvas>
-            <canvas class="thumbnail" id="reduced" width="300" height="225"></canvas>
+    <div class="row">
+        <div class="page-header">
+            <h3>Color-Quantization with Popularity-Algorithm</h3>
         </div>
-    </div>
-    <div class="row row1">
-        <div class="">
-            <canvas class="thumbnail" id="palette" width="500" height="500"></canvas>
-            <canvas class="thumbnail" id="paletteSpace" width="256" height="256"></canvas>
+        <div class="col-md-4">
+            <div class="input-group input-group-lg">
+                <span class="input-group-addon">Colors</span>
+                <input type="text" id="paletteSize" class="form-control">
+
+                  <span class="input-group-btn">
+                    <button id="btn" class="btn btn-warning" type="button">
+                        Draw
+                    </button>
+                  </span>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="input-group input-group-lg">
+                <span class="input-group-addon">Example-Image</span>
+                <select id="imageUrl" style="border-left: none; border:1px solid lightgrey; border-radius: 0;" class="input-lg">
+                    <option value="img/sweets.png">Sweets</option>
+                    <option value="img/plate.png">Plate</option>
+                    <option value="img/car.png">Car</option>
+                    <option value="img/ststevens.png">St. Stevens Tower</option>
+                </select>
+            </div>
         </div>
     </div>
 
     <div class="row">
-        <div class="col-lg-6">
-            <div class="input-group">
-                  <span class="input-group-btn">
-                    <button id="btn" class="btn btn-default" type="button">
-                        Draw
-                    </button>
-                  </span>
-                <input type="text" id="paletteSize" class="form-control">
+        <hr/>
+        <h4>Notice that for visual simplification the diagrams only plots the green (y) and red (x) color values to
+            depicture a flat graph instead of a 3d-cube.</h4>
+        <br/>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="panel panel-warning">
+                <div class="panel-heading">Original Image and Color Distribution</div>
+                <div class="panel-body">
+                    <canvas id="c"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="panel panel-warning">
+                <div class="panel-heading">Quantized Image</div>
+                <div class="panel-body">
+                    <canvas id="reduced"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="panel panel-warning">
+                <div class="panel-heading">Original Color Distribution</div>
+                <div class="panel-body">
+                    <canvas class="thumbnail" id="colorspace" width="256" height="256"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <hr/>
+    </div>
+
+    <div class="row">
+        <div class="col-md-10">
+            <div class="panel panel-warning">
+                <div id="colorTitle" class="panel-heading">!x!-Most Popular Colors and their Distribution</div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <canvas class="thumbnail" id="palette" width="500" height="500"></canvas>
+                            <label for="palette">Most Frequent Colors</label>
+                        </div>
+                        <div class="col-md-3">
+                            <canvas class="thumbnail" id="paletteSpace" width="256" height="256"></canvas>
+                            <label style="width: 250px;" for="paletteSpace">Distribution Most Frequent Colors</label>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
