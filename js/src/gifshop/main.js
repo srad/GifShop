@@ -1,4 +1,4 @@
-require(['domReady'], function (domReady) {
+require(['domReady', 'lzw'], function (domReady, Lzw) {
     'use strict';
 
     domReady(function () {
@@ -10,7 +10,8 @@ require(['domReady'], function (domReady) {
             colorTitle = document.getElementById('colorTitle'),
             paletteSize = document.getElementById('paletteSize'),
             colors = parseInt(paramColor, 10) || 256,
-            imageUrl = document.getElementById('imageUrl');
+            imageUrl = document.getElementById('imageUrl'),
+            btnEncode = document.getElementById('encode');
 
         colorTitle.innerHTML = colorTitle.innerHTML.replace('!x!', colors);
         imageUrl.value = paramImage;
@@ -50,6 +51,13 @@ require(['domReady'], function (domReady) {
         };
 
         imageObj.src = paramImage;
+
+        btnEncode.onclick = function (event) {
+            var lzw = new Lzw({alphabet: ['a', 'b', 'c', 'd']}),
+                word = 'aaaaaaaaaaaaaaaaacdcdccdcdbb';
+
+            console.log(lzw.compress(word));
+        };
 
         function Vec3d(x, y, z) {
             this.x = x;
